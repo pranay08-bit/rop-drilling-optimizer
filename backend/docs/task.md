@@ -1,0 +1,6 @@
+- [x] Restart FastAPI backend server and Vite React frontend server
+- [x] Modify pipeline orchestrator `main.py` to plot depth profile for all training wells
+- [x] Modify frontend `ResultsDashboard.jsx` to parse available plots and display well selector dropdown
+- [x] Run the pipeline with multiple wells selected and verify dropdown plot rendering
+- [x] Modify WellsTab.jsx to auto-save configuration silently in the background on selection updates
+- [x] Verify using browser subagent that running the pipeline immediately uses the updated well selection and shows the correct charts/metrics

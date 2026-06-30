@@ -1,0 +1,27 @@
+:root {
+  --bg-dark: #0D0D0D;
+  --bg-surface: #1A1A1A;
+  --bg-hover: #232323;
+  --border-default: #2A2A2A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --text-tertiary: #666666;
+  --color-success: #1D9E75;
+  --color-primary: #7F77DD;
+  --color-warning: #BA7517;
+  --color-error: #E24B4A;
+  --color-info: #378ADD;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+}
