@@ -7,19 +7,24 @@ import json
 import yaml
 import sys
 from pathlib import Path
+import os
 
 app = FastAPI()
 
+# Configure CORS to allow the frontend to talk to the backend
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173")
+origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Actual ML pipeline folder
-PIPELINE_DIR = Path("..")
+PIPELINE_DIR = Path(__file__).resolve().parent.parent
 CONFIG_FILE = PIPELINE_DIR / "config.yaml"
 OUTPUT_DIR = PIPELINE_DIR / "outputs"
 
