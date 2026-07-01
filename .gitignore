@@ -64,3 +64,6 @@ outputs/
 !models/
 !models/*.pkl
 !models/**/*.pkl
+
+# Unignore default data well file for the pipeline
+!data/Camel1_2016_OldGeoTimelog.csv
