@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BASE_URL } from '../api/client'
 
 const WELL_TEMPLATES = [
   { name: 'Apache Well A1', file: 'Apache_Well_A1.csv' },
@@ -30,7 +31,7 @@ function AddWellsModal({ isOpen, onClose, onAdd, onRefresh }) {
     formData.append('file', file)
 
     try {
-      const response = await fetch('http://localhost:8000/api/wells/upload', {
+      const response = await fetch(`${BASE_URL}/api/wells/upload`, {
         method: 'POST',
         body: formData,
       })
