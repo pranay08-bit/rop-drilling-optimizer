@@ -54,7 +54,7 @@ ENV/
 env/
 
 # ML Data & Output directories (ephemeral and large files)
-data/
+data/*
 outputs/
 *.pkl
 *.csv
