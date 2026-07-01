@@ -173,10 +173,14 @@ async def run_pipeline():
         if result_file.exists():
             result_file.unlink()
 
-        # Clear existing run.log
+        # Clear existing logs
         log_file = OUTPUT_DIR / "run.log"
         if log_file.exists():
             log_file.unlink()
+
+        debug_file = OUTPUT_DIR / "pipeline_debug.log"
+        if debug_file.exists():
+            debug_file.unlink()
 
         # Clear existing png files from outputs directory
         for f in OUTPUT_DIR.glob("*.png"):
@@ -185,10 +189,14 @@ async def run_pipeline():
             except Exception:
                 pass
 
-        pipeline_process = subprocess.Popen(
-            [sys.executable, "main.py"],
-            cwd=str(PIPELINE_DIR),
-        )
+        # Redirect child process stdout/stderr to debug file to catch startup crashes
+        with open(debug_file, "w") as fh:
+            pipeline_process = subprocess.Popen(
+                [sys.executable, "main.py"],
+                cwd=str(PIPELINE_DIR),
+                stdout=fh,
+                stderr=fh,
+            )
         return {"status": "running", "pid": pipeline_process.pid}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -198,14 +206,25 @@ async def run_pipeline():
 async def get_pipeline_status():
     global pipeline_process
     log_file = OUTPUT_DIR / "run.log"
+    debug_file = OUTPUT_DIR / "pipeline_debug.log"
 
     is_running = pipeline_process is not None and pipeline_process.poll() is None
     is_done = (OUTPUT_DIR / "optimization_result.json").exists()
 
     logs = []
+    # Try reading run.log first
     if log_file.exists():
         with open(log_file, 'r') as f:
-            logs = f.readlines()[-30:]
+            logs = f.readlines()
+
+    # Fall back to pipeline_debug.log if it contains more detailed info (e.g. traceback)
+    if debug_file.exists():
+        with open(debug_file, 'r') as f:
+            debug_logs = f.readlines()
+            if len(debug_logs) > len(logs):
+                logs = debug_logs
+
+    logs = logs[-30:]
 
     if is_done and not is_running:
         status = "complete"
