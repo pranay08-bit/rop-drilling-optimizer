@@ -20,7 +20,7 @@ COPY ./src /app/src
 COPY ./backend /app/backend
 COPY ./main.py /app/main.py
 COPY ./config.yaml /app/config.yaml
-COPY ./data /app/data
+RUN mkdir -p /app/data /app/outputs
 COPY ./models /app/models
 
 # Expose port 8000 for FastAPI

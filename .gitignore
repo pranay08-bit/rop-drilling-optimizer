@@ -56,7 +56,11 @@ env/
 # ML Data & Output directories (ephemeral and large files)
 data/
 outputs/
-models/
 *.pkl
 *.csv
 *.log
+
+# Unignore models folder and its pickle files
+!models/
+!models/*.pkl
+!models/**/*.pkl
