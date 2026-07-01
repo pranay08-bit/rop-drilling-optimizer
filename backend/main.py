@@ -170,17 +170,26 @@ async def run_pipeline():
     try:
         # Clear existing optimization result to prevent stale complete status
         result_file = OUTPUT_DIR / "optimization_result.json"
-        if result_file.exists():
-            result_file.unlink()
+        try:
+            if result_file.exists():
+                result_file.unlink()
+        except Exception:
+            pass
 
         # Clear existing logs
         log_file = OUTPUT_DIR / "run.log"
-        if log_file.exists():
-            log_file.unlink()
+        try:
+            if log_file.exists():
+                log_file.unlink()
+        except Exception:
+            pass
 
         debug_file = OUTPUT_DIR / "pipeline_debug.log"
-        if debug_file.exists():
-            debug_file.unlink()
+        try:
+            if debug_file.exists():
+                debug_file.unlink()
+        except Exception:
+            pass
 
         # Clear existing png files from outputs directory
         for f in OUTPUT_DIR.glob("*.png"):
@@ -190,13 +199,17 @@ async def run_pipeline():
                 pass
 
         # Redirect child process stdout/stderr to debug file to catch startup crashes
-        with open(debug_file, "w") as fh:
+        try:
+            fh = open(debug_file, "w", encoding="utf-8", errors="ignore")
             pipeline_process = subprocess.Popen(
                 [sys.executable, "main.py"],
                 cwd=str(PIPELINE_DIR),
                 stdout=fh,
                 stderr=fh,
             )
+        except Exception as e:
+            return {"status": "error", "message": f"Failed to start pipeline: {str(e)}"}
+            
         return {"status": "running", "pid": pipeline_process.pid}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -212,17 +225,23 @@ async def get_pipeline_status():
     is_done = (OUTPUT_DIR / "optimization_result.json").exists()
 
     logs = []
-    # Try reading run.log first
+    # Try reading run.log first, ignore lock errors on Windows
     if log_file.exists():
-        with open(log_file, 'r') as f:
-            logs = f.readlines()
+        try:
+            with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
+                logs = f.readlines()
+        except (PermissionError, OSError):
+            pass
 
     # Fall back to pipeline_debug.log if it contains more detailed info (e.g. traceback)
     if debug_file.exists():
-        with open(debug_file, 'r') as f:
-            debug_logs = f.readlines()
-            if len(debug_logs) > len(logs):
-                logs = debug_logs
+        try:
+            with open(debug_file, 'r', encoding='utf-8', errors='ignore') as f:
+                debug_logs = f.readlines()
+                if len(debug_logs) > len(logs):
+                    logs = debug_logs
+        except (PermissionError, OSError):
+            pass
 
     logs = logs[-30:]
 
